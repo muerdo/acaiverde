@@ -20,7 +20,7 @@ var usuarios = [
     for (var i = 0; i < usuarios.length; i++) {
       if (usuarios[i].codigo === codigoAcesso && usuarios[i].senha === senha) {
         alert('Autenticado com sucesso!');
-        window.location.href = '/home/franz/acai/cadastro/cadastro.html';
+        window.location.href = 'content/cadastro.html';
         return;
       }
     }
