@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulário de Cadastro</title>
+  <link rel="stylesheet" href="style.css">
+
+  <script src="script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  </head>
+
+<body>
+  <div class="form-container">
+    <form id="cadastroForm" class="form-style-3"> 
+      <fieldset id="dados-pessoais">
+        <legend>Dados Pessoais</legend>
+        <div class="grid-container">
+          <label for="cpf">CPF:</label>
+          <input type="text" id="cpf" name="cpf">
+
+          <label for="nome">Nome:</label>
+          <input type="text" id="nome" name="nome">
+
+          <label for="data-nascimento">Data de Nascimento:</label>
+          <input type="text" id="data-nascimento" name="data-nascimento">
+          <button type="button" onclick="nextFieldset()">Próxima</button>
+        </div>
+      </fieldset>
+
+      <fieldset id="sexo" class="hidden">
+        <legend>Sexo</legend>
+        <div class="grid-container">
+          <label for="sexo-masculino">Masculino</label>
+          <input type="radio" id="sexo-masculino" name="sexo" value="masculino" onchange="showFieldset('sexo', 'estado-civil')">
+
+          <label for="sexo-feminino">Feminino</label>
+          <input type="radio" id="sexo-feminino" name="sexo" value="feminino">
+
+          <label for="sexo-outro">Outro</label>
+          <input type="radio" id="sexo-outro" name="sexo" value="outro">
+        </div>
+        <button type="button" onclick="nextFieldset()">Próxima</button>
+      </fieldset>
+
+      <fieldset id="estado-civil" class="hidden">
+        <legend>Estado Civil</legend>
+        <div class="grid-container">
+          <label for="estado-civil-select">Estado Civil:</label>
+          <select id="estado-civil-select" name="estado-civil" onchange="showFieldset('estado-civil', 'renda-familiar')">
+            <option value="solteiro">Solteiro</option>
+            <option value="casado">Casado</option>
+            <option value="divorciado">Divorciado</option>
+            <option value="viuvo">Viúvo</option>
+          </select>
+        </div>
+        <button type="button" onclick="nextFieldset()">Próxima</button>
+      </fieldset>
+
+      <fieldset id="renda-familiar" class="hidden">
+        <legend>Renda Familiar</legend>
+        <div class="grid-container">
+          <label for="renda-familiar-input">Renda Familiar:</label>
+          <input type="text" id="renda-familiar-input" name="renda-familiar" onchange="showFieldset('renda-familiar', 'endereco')">
+
+          <label for="telefone">Telefone:</label>
+          <input type="text" id="telefone" name="telefone">
+
+          <label for="email">E-mail:</label>
+          <input type="text" id="email" name="email">
+        </div>
+        <button type="button" onclick="nextFieldset()">Próxima</button>
+      </fieldset>
+
+      <fieldset id="endereco" class="hidden">
+        <legend>Endereço</legend>
+        <div class="grid-container">
+          <label for="cep">CEP:</label>
+          <input type="text" id="cep" name="cep" onchange="showFieldset('endereco', 'chefe-familia')">
+      
+          <label for="municipio">Município:</label>
+          <input type="text" id="municipio" name="municipio">
+    
+          <label for="uf">UF:</label>
+          <input type="text" id="uf" name="uf">
+    
+          <label for="bairro">Bairro:</label>
+          <input type="text" id="bairro" name="bairro">
+    
+          <label for="logradouro">Logradouro:</label>
+          <input type="text" id="logradouro" name="logradouro">
+    
+          <label for="numero">Nº:</label>
+          <input type="text" id="numero" name="numero">
+    
+          <label for="complemento">Complemento:</label>
+          <input type="text" id="complemento" name="complemento">
+    
+          <label for="informacoes-adicionais">Informações adicionais:</label>
+          <input type="text" id="informacoes-adicionais" name="informacoes-adicionais">
+        </div>
+        <button type="button" onclick="nextFieldset()">Próxima</button>
+      </fieldset>
+    
+      <fieldset id="chefe-familia" class="hidden">
+        <legend>É Chefe de Família?</legend>
+        <div class="grid-container">
+          <span>Selecione uma opção:</span>
+          <label for="chefe-familia-sim">Sim</label>
+          <input type="radio" id="chefe-familia-sim" name="chefe-familia" value="sim" onchange="showFieldset('chefe-familia', 'dependentes')">
+      
+          <label for="chefe-familia-nao">Não</label>
+          <input type="radio" id="chefe-familia-nao" name="chefe-familia" value="nao">
+        </div>
+        <button type="button" onclick="nextFieldset()">Próxima</button>
+      </fieldset>
+      <fieldset id="dependentes" class="hidden">
+        <legend>Quantidade de Dependentes</legend>
+        <div class="grid-container">
+          <label for="quantidade-dependentes">Quantidade de Dependentes:</label>
+          <input type="number" id="quantidade-dependentes" name="quantidade-dependentes" onchange="showFieldset('dependentes', 'moradores')">
+        </div>
+        <button type="button" onclick="nextFieldset()">Próxima</button>
+      </fieldset>
+    
+      <fieldset id="moradores" class="hidden">
+        <legend>Pessoas que moram com você</legend>
+        <div class="grid-container">
+          <label for="quantidade-moradores">Quantidade de Moradores:</label>
+          <input type="number" id="quantidade-moradores" name="quantidade-moradores" onchange="showFieldset('moradores', 'deficiencia')">
+        </div>
+        <button type="button" onclick="nextFieldset()">Próxima</button>
+      </fieldset>
+    
+      <fieldset id="deficiencia" class="hidden">
+        <legend>Pessoas com Deficiência</legend>
+        <div class="grid-container">
+          <label for="quantidade-deficientes">Quantidade de Pessoas com Deficiência:</label>
+          <input type="number" id="quantidade-deficientes" name="quantidade-deficientes" onchange="showFieldset('deficiencia', 'observacoes')">
+          </div>
+          <button type="button" onclick="nextFieldset()">Próxima</button>
+          </fieldset>
+    
+          <fieldset id="observacoes" class="hidden">
+            <legend>Observações</legend>
+            <div class="grid-container">
+              <label for="observacoes-input">Observações:</label>
+              <textarea id="observacoes-input" name="observacoes"></textarea>
+            </div>
+            <button type="button" onclick="nextFieldset()">Próxima</button>
+          </fieldset>
+          <fieldset id="documentos" class="hidden">
+            <legend>Documentos</legend>
+            <div class="grid-container">
+              <label for="certidao-casamento">Certidão de Casamento:</label>
+              <input type="file" id="certidao-casamento" name="certidao-casamento">
+        
+              <label for="folha-resumo">Folha Resumo do CADUnico:</label>
+              <input type="file" id="folha-resumo" name="folha-resumo">
+        
+              <label for="laudo-medico">Laudo Médico:</label>
+              <input type="file" id="laudo-medico" name="laudo-medico">
+        
+              <label for="declaracao-cohabitacao">Auto Declaração de Cohabitação:</label>
+              <input type="file" id="declaracao-cohabitacao" name="declaracao-cohabitacao">
+            </div>
+            <button type="button" onclick="nextFieldset()">Próxima</button>
+          </fieldset>
+        
+          <fieldset id="relatorio" class="hidden">
+            <legend>Relatório</legend>
+            <button type="button" onclick="generatePDF()">Gerar Relatório em PDF e Enviar</button>
+          </fieldset>
+          
+          
+             
+    </form>
+  </div>
+
+  <script>   
+    var currentFieldsetIndex = 0;
+    var fieldsets = document.querySelectorAll('form#cadastroForm fieldset');
+  
+    function nextFieldset() {
+      var currentFieldset = fieldsets[currentFieldsetIndex];
+      currentFieldset.classList.add('hidden');
+      currentFieldsetIndex++;
+  
+      if (currentFieldsetIndex < fieldsets.length) {
+        var nextFieldset = fieldsets[currentFieldsetIndex];
+        nextFieldset.classList.remove('hidden');
+      }
+      
+    }
+  </script>
+</body>
+</html>
+    
+    
