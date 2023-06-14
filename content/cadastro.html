@@ -1,0 +1,497 @@
+
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulário de Cadastro</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="jspdf.umd.min.js"></script>
+   <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+   
+
+  <script>
+    function getFormData() {
+      var formData = new FormData(document.querySelector('form'));
+      var jsonData = {};
+      
+      for (var [key, value] of formData.entries()) {
+        jsonData[key] = value;
+      }
+      
+      console.log(jsonData);
+      
+      // Enviar jsonData para o servidor
+    }
+    
+    function exportXLSX() {
+      const formData = getFormData(); // Obter os valores do formulário
+      const data = convertFormDataToArray(formData);
+      const worksheet = XLSX.utils.json_to_sheet(data); // Converter os dados em uma planilha
+      const workbook = XLSX.utils.book_new(); // Criar um novo livro
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Form Data"); // Adicionar a planilha ao livro
+    
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      }); // Converter o livro em um buffer de array
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      }); // Criar um blob a partir do buffer de array
+      const filename = "formulario_cadastro.xlsx"; // Especificar o nome do arquivo
+    
+      if (navigator.msSaveBlob) {
+        // Para o IE 10+
+        navigator.msSaveBlob(blob, filename);
+      } else {
+        // Para outros navegadores
+        const link = document.createElement("a");
+        if (link.download !== undefined) {
+          // Definir o atributo de download para navegadores modernos
+          const url = URL.createObjectURL(blob);
+          link.setAttribute("href", url);
+          link.setAttribute("download", filename);
+          link.style.visibility = "hidden";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+    }
+    
+    function arrayToCSV(arr) {
+      const csvRows = [];
+    
+      for (let i = 0; i < arr.length; i++) {
+        const row = arr[i].map((item) => `"${item}"`).join(",");
+        csvRows.push(row);
+      }
+    
+      return csvRows.join("\n");
+    }
+    
+    function exportCSV() {
+      const formData = getFormData(); // Obter os valores do formulário
+      const data = convertFormDataToArray(formData);
+      const csvContent = arrayToCSV(data);
+      downloadFile(csvContent, "formulario_cadastro.csv", "text/csv");
+    }
+    
+    function convertFormDataToArray(formData) {
+      const data = [];
+      for (const [key, value] of Object.entries(formData)) {
+        data.push({ [key]: value });
+      }
+      return data;
+    }
+    
+    function downloadFile(content, filename, contentType) {
+      const blob = new Blob([content], { type: contentType });
+    
+      if (navigator.msSaveBlob) {
+        // Para o IE 10+
+        navigator.msSaveBlob(blob, filename);
+      } else {
+        // Para outros navegadores
+        const link = document.createElement("a");
+        if (link.download !== undefined) {
+          // Definir o atributo de download para navegadores modernos
+          const url = URL.createObjectURL(blob);
+          link.setAttribute("href", url);
+          link.setAttribute("download", filename);
+          link.style.visibility = "hidden";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+    }</script>
+    <script>
+      function sendFormData() {
+        var formData = new FormData(document.querySelector('#myForm'));
+        var jsonData = {};
+    
+        for (var [key, value] of formData.entries()) {
+          jsonData[key] = value;
+        }
+    
+        fetch('http://127.0.0.1:5000/api', {
+          method: 'POST',
+          body: JSON.stringify(jsonData),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          // Exibir mensagem de sucesso ou tratamento de erro, se necessário
+        })
+        .catch(error => {
+          console.error(error);
+          // Exibir mensagem de erro, se necessário
+        });
+    
+        // Impede o envio do formulário por meio da submissão padrão
+        return false;
+      }
+    </script>
+
+
+  </head>
+
+  <body>
+    <div>
+      <form id="myForm" method="POST" action="/processar">
+        <fieldset>
+          <legend>Dados Pessoais</legend>
+          <label for="nome-completo">Nome Completo:</label>
+          <input type="text" id="nome-completo" name="nome-completo" required>
+          <br>
+  
+          <label for="nascimento">Nascimento:</label>
+<input type="text" id="nascimento" name="nascimento" required pattern="[0-3][0-9][0-1][0-9][1-2][0-9]{3}" title="Digite uma data no formato DDMMAAAA" placeholder="DDMMAAAA" oninput="formatarData(this)">
+<br>
+          
+<label for "sexo" > Qual Gênero você se identifica?</label> <br> <br>
+<label for="masculino">Masculino</label>
+<input type="radio" id="masculino" name="sexo" value="masculino" required>
+
+<label for="feminino">Feminino</label>
+<input type="radio" id="feminino" name="sexo" value="feminino">
+
+<label for="outro">Outro</label>
+<input type="radio" id="outro" name="sexo" value="outro">
+<br>
+<br>
+          <label for="nacionalidade">Nacionalidade:</label>
+          <input type="text" id="nacionalidade" name="nacionalidade" required>
+          <br>
+  
+          <label for="naturalidade">Naturalidade:</label>
+          <input type="text" id="naturalidade" name="naturalidade" required>
+          <br>
+  
+          <label for="nome-mae">Nome da Mãe:</label>
+          <input type="text" id="nome-mae" name="nome-mae" required>
+          <br>
+        </fieldset>
+        <br> <label for="telefone">Telefone:</label>
+          <input type="text" id="telefone" name="telefone" required>
+          <br>
+  
+        <fieldset>
+          <legend>Documentos</legend>
+          <label for="rg">RG:</label>
+          <input type="text" id="rg" name="rg" required>
+          <br>
+  
+          <label for="cpf">CPF:</label>
+          <input type="text" id="cpf" name="cpf" required>
+          <br>
+  
+          <label for="orgao-emissor">Órgão Emissor:</label>
+          <input type="text" id="orgao-emissor" name="orgao-emissor" required>
+          <br>
+  
+          <label for="uf">UF:</label>
+          <input type="text" id="uf" name="uf" required>
+          <br>
+   
+          <label for="pis-nis-pasep">PIS/NIS/PASEP:</label>
+          <input type="text" id="pis-nis-pasep" name="pis-nis-pasep" required>
+          <br>
+        </fieldset>
+  
+        <fieldset>
+          <legend>Estado Civil</legend>
+          <label for="estado-civil">Estado Civil:</label>
+          <select id="estado-civil" name="estado-civil" required>
+            <option value="">Selecione</option>
+            <option value="solteiro">Solteiro</option>
+            <option value="casado">Casado</option>
+            <option value="divorciado">Divorciado</option>
+            <option value="viuvo">Viúvo</option>
+          </select>
+          <br>
+  
+          <div id="conjuge-fields">
+            <label for="cpf-conjuge">CPF do Cônjuge:</label>
+            <input type="text" id="cpf-conjuge" name="cpf-conjuge">
+            <br>
+          </div>
+        </fieldset>
+  
+        <fieldset>
+          <legend>Endereço</legend>
+          
+  
+          <label for="endereco-rua">Rua:</label>
+          <input type="text" id="endereco-rua" name="endereco-rua" required>
+          <br>
+          <label for="endereco-nmr">Número:</label>
+          <input type="text" id="endereco-nmr" name="endereco-nmr" required>
+          <br>
+  
+          <label for="endereco-bairro">Bairro:</label>
+          <input type="text" id="endereco-bairro" name="endereco-bairro" required>
+          <br>
+  
+          <label for="endereco-cidade">Cidade:</label>
+          <input type="text" id="endereco-cidade" name="endereco-cidade" required>
+          <br>
+  
+          <label for="endereco-uf">UF:</label>
+          <input type="text" id="endereco-uf" name="endereco-uf" required>
+          <br>
+  
+          <label for="endereco-cep">CEP:</label>
+          <input type="text" id="endereco-cep" name="endereco-cep" required>
+          <br>
+        </fieldset>
+  
+        <fieldset>
+          <legend>Seleção</legend>
+          <label for="idoso">Candidato Pessoa Idosa?</label>
+          <select id="idoso" name="idoso" required>
+            <option value="">Selecione</option>
+            <option value="sim">Sim</option>
+            <option value="nao">Não</option>
+          </select>
+          <br>
+                
+          <label for="deficiencia">Candidato Pessoa com Deficiência?</label>
+          <select id="deficiencia" name="deficiencia" required>
+            <option value="">Selecione</option>
+            <option value="sim">Sim</option>
+            <option value="nao">Não</option>
+          </select>
+        </fieldset>
+        
+        <label for="mulher-chefe">A mulher é chefe de família?</label>
+        <select id="mulher-chefe" name="mulher-chefe" required>
+          <option value="">Selecione</option>
+          <option value="sim">Sim</option>
+          <option value="nao">Não</option>
+        </select>
+        <br>
+                
+        <fieldset>
+          <legend>Família com Pessoa com Deficiência</legend>
+          <label for="familia-deficiencia">Há pessoa com deficiência na família?</label>
+          <select id="familia-deficiencia" name="familia-deficiencia" required>
+            <option value="">Selecione</option>
+            <option value="sim">Sim</option>
+            <option value="nao">Não</option>
+          </select>
+        </fieldset>
+        
+       
+        
+        <label for="mora-aluguel">Mora de Aluguel:</label>
+        <select id="mora-aluguel" name="mora-aluguel" required>
+          <option value="">Selecione</option>
+          <option value="sim">Sim</option>
+          <option value="nao">Não</option>
+        </select>
+        <br>
+        
+        <fieldset>
+          <label for="bolsa-familia">Recebe bolsa família?</label>
+          <select id="bolsa-familia" name="bolsa-familia" required>
+            <option value="">Selecione</option>
+            <option value="sim">Sim</option>
+            <option value="nao">Não</option>
+          </select>
+        </fieldset>
+        
+
+       
+        <fieldset>
+          <legend>Dados Sociais</legend>
+          <label for="qtd-menores">Quantidade de Menores de 0-17:</label>
+          <input type="number" id="qtd-menores" name="qtd-menores" required>
+          <br>
+        </fieldset>
+        
+        <fieldset>
+          <legend>Dados Sociais</legend>
+          
+          <label for="renda-legenda">Possui Renda?</label>
+          <br>
+          
+          <label>
+            <input type="radio" name="renda-option" value="sim" checked>
+            Sim
+          </label>
+          <br>
+          
+          <label>
+            <input type="radio" name="renda-option" value="nao">
+            Não
+          </label>
+          <br>
+  
+          <label for="profissao">Profissão:</label>
+          <input type="text" id="profissao" name="profissao" required>
+          <br>
+        </fieldset>
+          
+          <div id="valor-renda">
+            <label for="valor-renda">Valor da renda:</label>
+            <input type="text" id="valor-renda" name="valor-renda" placeholder="R$ 0,00">
+          </div>
+          <br>
+          
+          <label for="quantidade-pessoas">Quantidade de pessoas na família:</label>
+          <input type="number" id="quantidade-pessoas" name="quantidade-pessoas" min="0" required>
+          <br>
+          
+          <div id="laudo-medico" style="display: none;">
+            <label for="anexo-laudo">Anexe o laudo médico:</label>
+            <input type="file" id="anexo-laudo" name="anexo-laudo">
+          </div>
+        </fieldset>
+        
+          <br> 
+          <div id="laudo-medico-familia" style="display: none;">
+            <label for="anexo-laudo-familia">Anexe o laudo médico:</label>
+            <input type="file" id="anexo-laudo-familia" name="anexo-laudo-familia">
+          </div>
+        </fieldset>
+        
+
+    <button type="button" onclick="exportCSV()">Exportar para CSV</button>
+    <button type="button" onclick="exportXLSX()">Exportar para XLSX</button>
+    <button type="button" onclick="sendFormData()">Enviar</button>
+  </form>  
+
+
+  
+   
+
+
+
+<script>
+    
+    
+
+    
+    // Obtém os elementos select e campos de anexos
+    var selectPessoaDeficiencia = document.getElementById("deficiencia");
+    var campoAnexoLaudoPessoa = document.getElementById("laudo-medico");
+    var selectFamiliaDeficiencia = document.getElementById("familia-deficiencia");
+    var campoAnexoLaudoFamilia = document.getElementById("laudo-medico-familia");
+
+    // Adiciona um listener de evento para o select de Pessoa com Deficiência
+    selectPessoaDeficiencia.addEventListener("change", function() {
+      // Verifica se a opção selecionada é "Sim"
+      if (selectPessoaDeficiencia.value === "sim") {
+        // Exibe o campo de anexo para Pessoa com Deficiência
+        campoAnexoLaudoPessoa.style.display = "block";
+      } else {
+        // Oculta o campo de anexo para Pessoa com Deficiência
+        campoAnexoLaudoPessoa.style.display = "none";
+      }
+    });
+
+    // Adiciona um listener de evento para o select de Família com Pessoa com Deficiência
+    selectFamiliaDeficiencia.addEventListener("change", function() {
+      // Verifica se a opção selecionada é "Sim"
+      if (selectFamiliaDeficiencia.value === "sim") {
+        // Exibe o campo de anexo para Família com Pessoa com Deficiência
+        campoAnexoLaudoFamilia.style.display = "block";
+      } else {
+        // Oculta o campo de anexo para Família com Pessoa com Deficiência
+        campoAnexoLaudoFamilia.style.display = "none";
+      }
+    });
+
+    var selectPessoaDeficiencia = document.getElementById("deficiencia");
+    var campoAnexoLaudo = document.getElementById("laudo-medico");
+
+    // Adiciona um listener de evento para o select
+    selectPessoaDeficiencia.addEventListener("change", function() {
+      // Verifica se a opção selecionada é "Sim"
+      if (selectPessoaDeficiencia.value === "sim") {
+        // Exibe o campo de anexos
+        campoAnexoLaudo.style.display = "block";
+      } else {
+        // Oculta o campo de anexos
+        campoAnexoLaudo.style.display = "none";
+      }
+    });
+
+    const estadoCivilSelect = document.getElementById("estado-civil");
+    const cpfConjugeField = document.getElementById("conjuge-fields");
+
+    estadoCivilSelect.addEventListener("change", function() {
+      const estadoCivilValue = estadoCivilSelect.value;
+
+      if (estadoCivilValue === "casado") {
+        cpfConjugeField.style.display = "block";
+      } else {
+        cpfConjugeField.style.display = "none";
+      }
+    });
+
+    const inputs = document.querySelectorAll("#formulario input, #formulario select");
+
+    // Converter os dados do formulário em um array
+    const formData = {};
+    inputs.forEach((input) => {
+      const name = input.name;
+      const value = input.value;
+      formData[name] = value;
+    });
+
+    function calculateRendaPerCapita() {
+      const valorRendaElement = document.getElementById("valor-renda");
+      const quantidadePessoasElement = document.getElementById("quantidade-pessoas");
+
+      const valorRenda = valorRendaElement.value ? parseFloat(valorRendaElement.value.replace(",", ".")) : 0;
+      const quantidadePessoas = quantidadePessoasElement.value ? parseInt(quantidadePessoasElement.value) : 0;
+
+      const rendaPerCapita = quantidadePessoas !== 0 ? (valorRenda / quantidadePessoas).toFixed(2) : 0;
+
+      console.log("Renda per capita: R$ " + rendaPerCapita);
+        }
+      
+</script>
+<script>
+  function formatarData() {
+    var inputNascimento = document.getElementById("nascimento");
+    var nascimento = inputNascimento.value;
+    var regex = /(\d{2})(\d{2})(\d{4})/;
+    var dataFormatada = nascimento.replace(regex, "$1/$2/$3");
+    inputNascimento.value = dataFormatada;
+  }
+  
+  function validarFormulario() {
+    var nome = document.getElementById("nome").value.trim();
+    var nascimento = document.getElementById("nascimento").value.trim();
+    var anexoLaudo = document.getElementById("anexoLaudo").value.trim();
+
+    var errorMessages = [];
+
+    if (nome === "") {
+      errorMessages.push("Nome é obrigatório.");
+    }
+
+    if (nascimento === "") {
+      errorMessages.push("Data de nascimento é obrigatória.");
+    }
+
+    if (anexoLaudo === "") {
+      errorMessages.push("Anexo do laudo é obrigatório.");
+    }
+
+    if (errorMessages.length > 0) {
+      document.getElementById("errorMessages").innerHTML = errorMessages.join("<br>");
+      return false;
+    }
+
+    return true;
+  }
+</script>
+  </body>
+  </html>
+  
